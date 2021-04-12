@@ -1,6 +1,17 @@
 /**
  * PostCSS 配置文件
  */
+// module.exports = {
+//   plugins: {
+//     autoprefixer: {
+//       browsers: ['Android >= 4.0', 'iOS >= 8']
+//     },
+//     'postcss-pxtorem': {
+//       rootValue: 37.5,
+//       propList: ['*']
+//     }
+//   }
+// }
 
 module.exports = {
   // 配置要使用的 PostCSS 插件
@@ -30,7 +41,12 @@ module.exports = {
       //    函数：可以动态处理返回
       //          postcss-pxtorem 处理每个 CSS 文件的时候都会来调用这个函数
       //          它会把被处理的 CSS 文件相关的信息通过参数传递给该函数
-      rootValue ({ file }) {
+      rootValue({ file }) {
+        // console.log(file)
+        // return 37.5
+        // 我们的设计稿是750px而vant的设计稿是375px,对于vant 1rem=37.5px ;
+        // 对于我们自己的设计稿1rem=750px 所以我们要判断1rem是多少px
+        // 当file中有vant时，我们采用1rem=37.5px,当file中没有vant时我们采用1rem=75px
         return file.indexOf('vant') !== -1 ? 37.5 : 75
       },
 
