@@ -1,10 +1,20 @@
 <template>
   <div class="login-container">
     <!-- 导航栏start -->
-    <van-nav-bar class="page-nav-bar" title="登录" />
+    <van-nav-bar class="page-nav-bar" title="登录" >
+      <!--导航栏左侧关闭的按钮-->
+      <van-icon
+        class="close"
+        name="cross"
+        slot="left"
+        @click="$router.back()"
+      >
+      </van-icon>
+    </van-nav-bar>
     <!-- 导航栏end-->
     <!-- 登录表单start -->
     <van-form ref="loginForm" @submit="onSubmit">
+      <!--当表单验证通过会触发submit事件，验证失败不会触发submit事件-->
       <!-- 手机号输入框start -->
       <van-field
         v-model="user.mobile"
@@ -32,7 +42,7 @@
           <van-count-down
             v-if="isCountDownShow"
             slot="button"
-            :time="1000 * 5"
+            :time="1000 * 60"
             format="ss s"
             @finish="isCountDownShow = false"
           />
@@ -43,7 +53,7 @@
             size="small"
             class="send-sms-btn"
             native-type="button"
-            @click="onSendSmsCode"
+            @click="onSendSms"
             >发送验证码
           </van-button>
         </template>
@@ -62,11 +72,11 @@
 </template>
 
 <script>
-// 导入user.js文件 用户请求模块
+// 导入登录(login)和发送验证码(sendSms)的api接口
 import { login, sendSms } from '@/api/user'
 
 export default {
-  name: 'LoginPage',
+  name: 'LoginIndex',
   components: {},
   props: {},
   data() {
@@ -81,7 +91,7 @@ export default {
           { required: true, message: '手机号不能为空' },
           {
             pattern: /^1[3|5|7|8|9]\d{9}$/,
-            message: '手机号格式错误，请重新输入手机号'
+            message: '手机号格式错误，请重新输入正确的手机号'
           }
         ],
         code: [
@@ -102,7 +112,7 @@ export default {
     async onSubmit() {
       // console.log(111)
       // 1.获取表单数据
-      const user = this.user
+      // const user = this.user
       // 2.表单验证
       // 给van-field组件配置rules属性，从而实现表单的验证
       // 3.提交表单请求登录
@@ -115,18 +125,16 @@ export default {
       })
       // 4.根据请求响应处理后的结果,验证通过后进行手机号码和验证码的校验
       try {
-        // console.log(111)
-        const res = await login(user)
-        // 登录成功之后，this.$store.commit调用函数将token保存在容器中，以便y用户再次登录时有验证
-        // res.data是一个obj对象，这个obj对象中保存着token和refresh_token两个属性
-        // 这两个属性的值均为字符串，token用于用户验证的令牌，
-        // 而refresh_token刷新的令牌，用于访问令牌过期之后重新获取新的访问令牌，使用 `refresh_token` 解决 `token` 过期
-        // token有效期为2小时，refresh_token有效期为14天
-        this.$store.commit('setUser', res.data.data)
-        console.log('登录成功', res)
+        // data为调用接口返回回来的数据，把其解构出来，data.data
+        // data.data是一个obj对象，这个obj对象中保存着token和refresh_token两个属性
+        const { data } = await login(this.user)
+        this.$store.commit('setUser', data.data)
+        // console.log('登录成功', data)
+        // 登录成功之后，跳转页面
+        this.$router.back()
         this.$toast.success('登录成功')
       } catch (error) {
-        console.log(error)
+        // console.log(error)
         if (error.response.status === 400) {
           // console.log('手机号或者验证码错误')
           this.$toast.fail('手机号或者验证码错误')
@@ -137,8 +145,8 @@ export default {
       }
     },
     // 发送验证码
-    async onSendSmsCode() {
-      // // 1.对手机号进行校验
+    async onSendSms() {
+      // 1.对手机号进行校验
       try {
         // console.log(this)
         await this.$refs.loginForm.validate('mobile')
@@ -146,15 +154,17 @@ export default {
         // catch只能捕捉到同步的错误
         return console.log('验证失败', error)
       }
-      // 2.验证通过显示倒计时效果
-      this.$isCountDownShow = true
-      // 3.请求发送验证码
+      // 2.验证通过，点击发送验证码按钮，显示倒计时效果
+      this.isCountDownShow = true
+      // 3.调用接口，请求发送验证码
       try {
         await sendSms(this.user.mobile)
         this.$toast('发送成功')
       } catch (error) {
+        // 发送失败，关闭倒计时
+        this.isCountDownShow = false
         if (error.response.status === 429) {
-          this.$toast('访问次数受限，请稍后重新发送')
+          this.$toast('发送太频繁了，请稍后重新发送')
         } else {
           this.$toast('验证码发送错误，请重新发送')
         }

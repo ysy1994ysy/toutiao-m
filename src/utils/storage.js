@@ -1,5 +1,12 @@
-// 封装本地存储token的模块
+// 封装用于处理token的函数
 // 存储数据
+export const setItem = (key, value) => {
+  if (typeof value === 'object') {
+    value = JSON.stringify(value)
+  }
+  window.localStorage.setItem(key, value)
+}
+// 获取数据
 export const getItem = key => {
   const data = window.localStorage.getItem(key)
   try {
@@ -7,13 +14,6 @@ export const getItem = key => {
   } catch (err) {
     return data
   }
-}
-// 获取数据
-export const setItem = (key, value) => {
-  if (typeof value === 'object') {
-    value = JSON.stringify(value)
-  }
-  window.localStorage.setItem(key, value)
 }
 // 删除数据
 export const removeItem = value => {
