@@ -13,7 +13,7 @@ const routes = [
   },
   {
     path: '/',
-    name: 'layout',
+    // name: 'layout',
     component: () => import('@/views/layout'),
     children: [
       {

@@ -2,7 +2,8 @@ import Vue from 'vue'
 import App from './App.vue'
 import router from './router'
 import store from './store'
-
+// 导入处理时间的js文件
+import './utils/dayjs'
 // 导入vant组件库
 import Vant from 'vant'
 // 加载全局样式
