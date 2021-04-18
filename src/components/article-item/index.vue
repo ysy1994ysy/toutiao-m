@@ -90,12 +90,12 @@ export default {
     .cover-item {
       flex: 1;
       height: 146px;
-      //&:not(:last-child) {
-      //  padding-right: 4px;
-      //}
-      &:nth-child(2) {
-        padding: 0 4px;
+      &:not(:last-child) {
+        padding-right: 4px;
       }
+      //&:nth-child(2) {
+      //  padding: 0 4px;
+      //}
       .cover-item-img {
         width: 100%;
         height: 146px;

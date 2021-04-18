@@ -33,34 +33,57 @@
       <!--右侧占位符，防止最后一个频道列表标签栏被挡住start-->
       <div slot="nav-right" class="placeholder"></div>
       <!--右侧占位符，防止最后一个频道列表标签栏被挡住end-->
-      <div slot="nav-right" class="hamburger-btn">
+      <div slot="nav-right" class="hamburger-btn" @click="isChannelEditShow = true">
         <i class="toutiao toutiao-gengduo"></i>
       </div>
       <!--汉堡按钮end-->
       <!--更多end-->
     </van-tabs>
   <!--频道列表标签栏end-->
+    <!--频道编辑start-->
+    <van-popup
+      v-model="isChannelEditShow"
+      closeable
+      close-icon-position="top-left"
+      position="bottom"
+      :style="{ height: '100%' }"
+    >
+      <channel-edit
+        :my-channel="channels"
+        :active="active"
+        @updata-active="onUpdataActive"
+      ></channel-edit>
+    </van-popup>
+    <!--频道编辑start-->
   </div>
 </template>
 
 <script>
 // 导入获取用户频道信息的数据
 import { getUserChannels } from '@/api/user'
+import { getItem } from '@/utils/storage'
 // 导入子组件
 import ArticleList from './components/article-list'
+// 导入频道编辑组件
+import ChannelEdit from './components/channel-edit'
+import { mapState } from 'vuex'
 export default {
   name: 'HomeIndex',
   components: {
-    ArticleList
+    ArticleList,
+    ChannelEdit
   },
   props: {},
   data () {
     return {
       active: 0,
-      channels: [] // 用户频道的信息的数据
+      channels: [], // 用户频道的信息的数据
+      isChannelEditShow: false // 用于频道编辑区的显示与隐藏
     }
   },
-  computed: {},
+  computed: {
+    ...mapState(['user'])
+  },
   watch: {},
   created () {
     this.localChannels() // 加载用户频道的信息的数据
@@ -69,12 +92,48 @@ export default {
   methods: {
     async localChannels () {
       try {
-        const { data } = await getUserChannels()
+        // const { data } = await getUserChannels()
         // console.log(data)
-        this.channels = data.data.channels
+        // this.channels = data.data.channels
+        let channels = []
+        const storageChannels = getItem('TOUTIAO_CHANNELS')
+        // ******************
+        // // 判断用户是否登录
+        // if (this.user) {
+        //   // 用户登录了,请求获取用户频道数据
+        //   const { data } = await getUserChannels()
+        //   channels = data.data.channels
+        //   this.channels = channels
+        // } else {
+        // // 用户没有登录,判断是否有本地存储
+        //   const storageChannels = getItem('TOUTIAO_CHANNELS')
+        //   if (storageChannels) {
+        //   //  登录了,获取使用
+        //     channels = storageChannels
+        //   } else {
+        //     // 没有登录,请求获取推荐频道数据
+        //     const { data } = await getUserChannels()
+        //     channels = data.data.channels
+        //   }
+        // }
+        // 用户没有登录并且有本地存储，则加载本地存储
+        if (!this.user && storageChannels) {
+          this.channels = storageChannels
+        } else {
+          // 用户登录了，则加载线上数据
+          const { data } = await getUserChannels()
+          channels = data.data.channels
+          this.channels = channels
+        }
       } catch (err) {
         this.$toast('获取用户频道信息失败！')
       }
+    },
+    onUpdataActive (index, isChannelEditShow = true) {
+      // 将索引值赋值给其选定状态，所以点击了我的频道项中的那个，所以就选定了那个
+      this.active = index
+      // 关闭弹出层
+      this.isChannelEditShow = isChannelEditShow
     }
   }
 }

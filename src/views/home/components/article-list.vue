@@ -34,7 +34,7 @@
         @load="onLoad"
       >
 
-<!--         <van-cell v-for="(article,index) in list" :key="index" :title="article.title" />-->
+        <!--<van-cell v-for="(article,index) in list" :key="index" :title="article.title" />-->
         <article-item v-for="(article,index) in list" :key="index" :article="article" />
       </van-list>
     </van-pull-refresh>
@@ -80,7 +80,7 @@ export default {
         // 1.获取用户数据
         const { data } = await getArticles({
           channel_id: this.channel.id, // 频道ID
-          timestamp: Date.now() || this.timestamp, // 时间戳，请求新的推荐数据传当前的时间戳，请求历史推荐传指定的时间戳
+          timestamp: this.timestamp || Date.now(), // 时间戳，请求新的推荐,数据当前的时间戳，请求历史推荐指定的时间戳
           with_top: 1 // 是否包含置顶，进入页面第一次请求时要包含置顶文章，1-包含置顶，0-不包含
         })
         // 2.把获取到的数据存储到list数组中
@@ -91,7 +91,7 @@ export default {
         this.loading = false
         // 4.判断加载是否结束结束
         if (results.length) {
-          // 更新获取下一页数据,pre_timestamp是求前一页历史数据的时间戳
+          // 更新获取下一页数据,pre_timestamp是求下一页历史数据的时间戳
           this.timestamp = data.data.pre_timestamp
         } else {
           // 没有数据了，设置加载状态结束，不在加载数据了
@@ -131,8 +131,10 @@ export default {
 }
 </script>
 
-<style lang="less">
-.van-tabs__wrap {
+<style lang="less" scoped>
+// 设置滚动容器，1vh=可视窗口高度的百分之一,高度是响应式的,1vw=可视窗口宽度的百分之一,宽度也是响应式的
+.article-list {
+  //height: clac(100vh-274px);
   height: 79vh;
   overflow-y: auto;
 }
