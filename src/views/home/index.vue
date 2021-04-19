@@ -11,6 +11,7 @@
         type="info"
         round
         icon="search"
+        to="/search"
       >搜素</van-button>
     <!--搜索框end-->
     </van-nav-bar>
@@ -108,10 +109,10 @@ export default {
         // // 用户没有登录,判断是否有本地存储
         //   const storageChannels = getItem('TOUTIAO_CHANNELS')
         //   if (storageChannels) {
-        //   //  登录了,获取使用
+        //   //  有本地存储,使用本地存储
         //     channels = storageChannels
         //   } else {
-        //     // 没有登录,请求获取推荐频道数据
+        //     // 没有本地存储,请求获取推荐频道数据
         //     const { data } = await getUserChannels()
         //     channels = data.data.channels
         //   }
