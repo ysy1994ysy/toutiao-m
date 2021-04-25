@@ -1,6 +1,18 @@
 <template>
   <!--文章列表项start-->
-  <van-cell class="article-item">
+<!-- 1.:to="'/artcile/'+article.art_id"
+     2.:to="`/article/${article.art_id}`"
+  -->
+  <van-cell
+    class="article-item"
+    :to="{
+      // 路由的名称
+      name: 'article',
+      params: {
+        // 路由的动态参数
+        articleId: article.art_id
+      }
+    }">
     <!--文章标题start-->
     <div slot="title" class="title van-multi-ellipsis--l3">
       {{ article.title }}

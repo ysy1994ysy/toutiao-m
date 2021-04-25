@@ -59,6 +59,10 @@ export default {
     },
     highLight (text) {
       // 采用正则表达式进行匹配
+      // 如果需要根据数据变量动态的创建正则表达式,则需要手动 new RegExp
+      // RegExp 正则表达式构造函数
+      // 参数1：匹配模式字符串,它会根据这个字符串创建正则对象
+      // 参数2: 匹配模式,要写在字符串中
       const htmlStr = `<span class="active">${this.searchText}</span>`
       const reg = new RegExp(this.searchText, 'gi')
       return text.replace(reg, htmlStr)
@@ -68,7 +72,7 @@ export default {
 </script>
 <style lang='less' scoped>
 .search-suggestion {
-  /deep/.active {
+  /deep/span.active {
     color: #3296fa;
   }
 }

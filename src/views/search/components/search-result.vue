@@ -46,7 +46,7 @@ export default {
       try {
         // 1.请求获取数据
         const { data } = await getSearchResults({
-          page: 1, // 页数，不传默认为1
+          page: this.page, // 页数，不传默认为1
           per_page: this.per_page, // 每页数量，不传每页数量由后端决定
           q: this.searchText // 搜索关键字
         })
