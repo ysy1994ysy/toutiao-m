@@ -6,16 +6,13 @@
       <!-- 个人头像-用户名-编辑资料start -->
       <div class="base-info">
         <div class="left">
-          <van-image
-            class="avator"
-            round
-            fit="cover"
-            :src="userInfo.photo"
-          />
+          <van-image class="avator" round fit="cover" :src="userInfo.photo" />
           <span class="name">{{ userInfo.name }}</span>
         </div>
         <div class="right">
-          <van-button type="default" round size="mini">编辑资料</van-button>
+          <van-button type="default" round size="mini" to="/user/profile"
+            >编辑资料</van-button
+          >
         </div>
       </div>
       <!-- 个人头像-用户名-编辑资料end -->
@@ -64,7 +61,13 @@
     <!--消息通知-小智同学-退出登录start-->
     <van-cell title="消息通知" is-link />
     <van-cell title="小智同学" is-link />
-    <van-cell clickable v-if="user" title="退出登录" class="layout-cell" @click="onLogout"/>
+    <van-cell
+      clickable
+      v-if="user"
+      title="退出登录"
+      class="layout-cell"
+      @click="onLogout"
+    />
     <!--消息通知-小智同学-退出登录end-->
   </div>
 </template>
@@ -96,14 +99,15 @@ export default {
   mounted() {},
   methods: {
     // 点击退出按钮，让用户选择是否退出
-    onLogout () {
+    onLogout() {
       // console.log(111)
-      this.$dialog.confirm({
-        title: '退出提示',
-        message: '您确认要退出吗？',
-        cancelButtonColor: 'red',
-        confirmButtonColor: 'skyblue'
-      })
+      this.$dialog
+        .confirm({
+          title: '退出提示',
+          message: '您确认要退出吗？',
+          cancelButtonColor: 'red',
+          confirmButtonColor: 'skyblue'
+        })
         .then(() => {
           // 确认退出，清除容器和本地存储中的token
           this.$store.commit('setUser', null)
@@ -113,7 +117,7 @@ export default {
           console.log('该用户退出了')
         })
     },
-    async loadUserInfo () {
+    async loadUserInfo() {
       try {
         // console.log('获取用户信息成功')
         const { data } = await getUserInfo()

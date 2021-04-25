@@ -51,6 +51,12 @@ const routes = [
     name: 'article',
     component: () => import('@/views/article'),
     props: true // 开启props路由传参,将路由参数articleId映射到组件中
+  },
+  // 编辑资料的路由
+  {
+    path: '/user/profile',
+    name: 'user-profile',
+    component: () => import('@/views/user-profile')
   }
 ]
 
