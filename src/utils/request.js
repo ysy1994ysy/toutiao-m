@@ -79,7 +79,7 @@ request.interceptors.response.use(function (response) {
   } catch (error) {
     // 如果获取失败,直接跳转到登录页面
     console.log('请求刷新token失败', error)
-    router.push('/login')
+    return router.push('/login')
   }
   return Promise.reject(err)
 })
