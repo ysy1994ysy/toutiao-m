@@ -3,6 +3,7 @@ import axios from 'axios'
 import store from '@/store'
 // 导入处理大数字的包
 import jsonBig from 'json-bigint'
+import router from '../router'
 const request = axios.create({
   baseURL: 'http://ttapi.research.itcast.cn/', // 请求url根路径
   // data:后端返回的数据,即json格式的字符串,axios会使用json.parse(data),自动的将其转化为json格式的对象
@@ -11,6 +12,7 @@ const request = axios.create({
   // jsonBig.parse()&jsonBig.stringify() 与json.parse()&json.stringify()类似
   // 由于大数字的导致错误,我们要自己使用jsonBig解析后端返回的json格式的字符串
   // jsonBig可以处理超出JavaScript安全证书范围的问题,jsonBig.parse()
+  // 结果大数字问题
   transformResponse: [function (data) {
     try {
       // 将后端返回的数据通过jsonBig.parse(),转化为对象
@@ -38,5 +40,47 @@ request.interceptors.request.use(function(config) {
   // 如果错误，把错误的消息return出去
   return Promise.reject(error)
 })
+
 // 响应拦截器
+// 处理tokken过期,利用refresh_token更新token
+request.interceptors.response.use(function (response) {
+  // 响应成功,进入第一个函数
+  return response
+}, async function (err) {
+  // 响应失败,进入第二个函数
+  console.dir(err)
+  // 如果响应错误,则会进入该函数中,并且响应的状态码是401
+  // 判断是否有响应,并且响应的状态码是否是401
+  // 从vuex容器中拿到用户的信息
+  const user = store.state.user
+  if (err.response && err.response.status === 401) {
+    //  如果用户没有登录或者没有携带refresh_token,跳转到登录页面,让用户登录
+    if (!user || !user.refresh_token) {
+      return router.push('/login')
+    }
+  }
+  // 如果用户登录了,并且有refresh_token,则请求获取新的token
+  try {
+    // 调用刷新token的接口
+    const res = await axios({
+      method: 'PUT',
+      url: 'http://ttapi.research.itcast.cn/app/v1_0/authorizations',
+      headers: {
+        Authorization: `Bearer ${user.refresh_token}`
+      }
+    })
+
+    // 如果刷新成功,则把新的token更新到vuex容器中
+    console.log('更新token成功', res)
+    store.commit('setUser', {
+      token: res.data.data.token, // vuex容器中,得到的最新的token
+      refresh_token: user.refresh_token // 还原原来的refresh_token
+    })
+  } catch (error) {
+    // 如果获取失败,直接跳转到登录页面
+    console.log('请求刷新token失败', error)
+    router.push('/login')
+  }
+  return Promise.reject(err)
+})
 export default request

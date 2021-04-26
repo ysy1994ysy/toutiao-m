@@ -154,7 +154,10 @@ export default {
       }
     },
     onFileChange () {
-    //  获取文件对象
+      // console.log(e)
+      // const a = e.target.files[0]
+      // console.log(a)
+      // 获取文件对象
       const File = this.$refs.file.files[0]
       // 基于文章获取图片blob数据
       // const data = window.URL.createObjectURL(file)
